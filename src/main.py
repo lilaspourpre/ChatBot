@@ -1,7 +1,7 @@
 import os
 os.environ['KERAS_BACKEND']='tensorflow'
-from seq2seq_trainer import train_model
 from entities.Seq2Seq import CustomSeq2Seq
+from entities.GAN import GAN
 from dataset_creator import *
 
 
@@ -14,14 +14,23 @@ def __get_external_parameters():
                         required=True, help='input file (raw or prepared json)')
     parser.add_argument('-c', type=str, dest='config_file', metavar='<config file>',
                         required=False, help='configuration file with dicts and max_len', default=None)
-    parser.add_argument('-m', type=str, dest='model', metavar='<model>',
-                        required=False, help='model to use', default=CustomSeq2Seq)
+    parser.add_argument('-m', type=choose_model, dest='model', metavar='<model>',
+                        required=False, choices=(CustomSeq2Seq, GAN), help='model to use: seq2seq or gan', default="gan")
     args = parser.parse_args()
     directory = args.output_directory
     input_file = args.input_file
     config_file = args.config_file
     model = args.model
     return directory, input_file, config_file, model
+
+
+def choose_model(encoder_type):
+    if encoder_type.lower() == "seq2seq":
+        return CustomSeq2Seq
+    elif encoder_type.lower() == "gan":
+        return GAN
+    else:
+        raise Exception("Unknown encoder name {}".format(encoder_type))
 
 
 def read_json_file(input_file):
@@ -52,7 +61,7 @@ def main():
     hidden_size = 128
     max_features = len(id2word)
     nn = nn_model(max_features, embedding_size, hidden_size, max_len)
-    model = train_model(nn, dataset, max_len, max_features, BATCH_SIZE, EPOCHS)
+    model = nn.train_model(dataset, max_len, max_features, BATCH_SIZE, EPOCHS)
     model.save(os.path.join(target_directory, "model.h5"))
 
 
