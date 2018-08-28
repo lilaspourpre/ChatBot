@@ -17,7 +17,7 @@ class Model:
         return " ".join(answer).capitalize()
 
     def __encode(self, input_phrase):
-        tokenized = word_tokenize(input_phrase, "english")
+        tokenized = word_tokenize(input_phrase, "russian")
         sentence_int = [self.__word2id[w.lower()] for w in tokenized]
         return sentence_int
 

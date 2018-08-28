@@ -26,7 +26,7 @@ def create_dataset(sentences):
 def read_txt_file(input_file):
     with open(input_file, "r", encoding="utf-8") as f:
         sentences_list = f.readlines()
-    return sentences_list
+    return [i for i in sentences_list if i != ""]
 
 
 def _write_to_json(path, dataset, id2word, word2id, max_len):

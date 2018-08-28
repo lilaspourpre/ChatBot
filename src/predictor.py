@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 import argparse
 import os
 os.environ['KERAS_BACKEND']='tensorflow'
@@ -18,7 +19,10 @@ def __get_external_parameters():
 def main():
     config_path, model_path = __get_external_parameters()
     model = Model(config_path, model_path)
-    input_phrase = "Why?"
+    input_phrase = "Какой полк?"
+    print(input_phrase)
+    print(model.answer(input_phrase))
+    input_phrase = "Успеют ли наши?"
     print(input_phrase)
     print(model.answer(input_phrase))
     # while True:

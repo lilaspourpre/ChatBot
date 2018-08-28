@@ -11,6 +11,7 @@ from keras.optimizers import Adam
 from entities.TrainModel import TrainModel
 
 
+
 def __decode(num, decode_size):
     result = [0] * decode_size
     result[num] = 1

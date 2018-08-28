@@ -15,7 +15,7 @@ def __get_external_parameters():
     parser.add_argument('-c', type=str, dest='config_file', metavar='<config file>',
                         required=False, help='configuration file with dicts and max_len', default=None)
     parser.add_argument('-m', type=choose_model, dest='model', metavar='<model>',
-                        required=False, choices=(CustomSeq2Seq, GAN), help='model to use: seq2seq or gan', default="gan")
+                        required=False, choices=(CustomSeq2Seq, GAN), help='model to use: seq2seq or gan', default="seq2seq")
     args = parser.parse_args()
     directory = args.output_directory
     input_file = args.input_file
@@ -45,7 +45,7 @@ def load_config(config_file):
 
 
 def main():
-    EPOCHS = 50
+    EPOCHS = 500
     BATCH_SIZE = 16
 
     target_directory, input_file, config_file, nn_model = __get_external_parameters()
