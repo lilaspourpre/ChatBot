@@ -6,6 +6,18 @@ import re
 from collections import OrderedDict
 
 
+def _get_external_parameters():
+    parser = argparse.ArgumentParser(description='Train sequence model for dialogues')
+    parser.add_argument('-d', type=str, dest='directory', metavar='<directory>',
+                        required=True, help='directory for results')
+    parser.add_argument('-i', type=str, dest='input_file', metavar='<input file>',
+                        required=True, help='input file with train set')
+    args = parser.parse_args()
+    directory = args.directory
+    input_file = args.input_file
+    return directory, input_file
+
+
 def _tokenize_sentence(sentence, language):
     tokens = nltk.tokenize.word_tokenize(sentence, language)
     return tokens
@@ -38,18 +50,6 @@ def _write_to_json(path, dataset, id2word, word2id, max_len):
     with open(os.path.join(path, "config.json"), "w") as c:
         config = OrderedDict([("id2word", id2word), ("word2id", word2id), ("max_len", max_len)])
         json.dump(config, c)
-
-
-def _get_external_parameters():
-    parser = argparse.ArgumentParser(description='Train sequence model for dialogues')
-    parser.add_argument('-d', type=str, dest='directory', metavar='<directory>',
-                        required=True, help='directory for results')
-    parser.add_argument('-i', type=str, dest='input_file', metavar='<input file>',
-                        required=True, help='input file with train set')
-    args = parser.parse_args()
-    directory = args.directory
-    input_file = args.input_file
-    return directory, input_file
 
 
 def main():

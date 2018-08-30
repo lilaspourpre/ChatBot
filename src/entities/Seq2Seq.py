@@ -8,20 +8,17 @@ from entities.TrainModel import TrainModel
 
 
 class CustomSeq2Seq(TrainModel):
-    epoch = 0
 
     def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory):
         super(CustomSeq2Seq, self).__init__()
         self.encoder_input = Input(shape=(max_len,))
         self.target_directory = target_directory
         self.epoch = 0
-        # encoder step
         self.embedded = Embedding(input_dim=vocabulary_size, output_dim=embedding_size, trainable=False)(
             self.encoder_input)
         self.encoder = Bidirectional(
             LSTM(units=hidden_size, input_shape=(max_len, embedding_size), return_sequences=True,
                  dropout=0.25, recurrent_dropout=0.25))(self.embedded)
-        # compute importance for each step
         self.attention = Dense(1, activation='tanh')(self.encoder)
         self.attention = Flatten()(self.attention)
         self.attention = Activation('softmax')(self.attention)
@@ -59,6 +56,6 @@ class CustomSeq2Seq(TrainModel):
             # restart counter to yeild data in the next epoch as well
             if counter == number_of_batches:
                 if save:
-                    self.model.save(os.path.join(self.target_directory, "models", "model{}.h5".format(self.epoch)))
+                    self.model.save(os.path.join(self.target_directory, "models", "model_epoch{}.h5".format(self.epoch)))
                     self.epoch += 1
                 counter = 0

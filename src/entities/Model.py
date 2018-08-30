@@ -24,6 +24,6 @@ class Model:
 
     def __predict(self, x_input):
         x_pad = pad_sequences([x_input], maxlen=self.__max_len, padding="post")
-        pred = self.__model.predict(x_pad)
-        return [self.__id2word[str(np.argmax(pred[i][j]))] for i in range(len(pred)) for j in range(len(pred[i]))]
-
+        predicted = self.__model.predict(x_pad)
+        return [self.__id2word[str(np.argmax(predicted[i][j]))] for i in range(len(predicted))
+                for j in range(len(predicted[i]))]
