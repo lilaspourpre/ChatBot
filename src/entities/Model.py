@@ -2,7 +2,7 @@ import numpy as np
 from nltk.tokenize import word_tokenize
 from keras import models
 from keras.preprocessing.sequence import pad_sequences
-
+import re
 from main import load_config
 
 
@@ -14,7 +14,8 @@ class Model:
     def answer(self, raw_text_question):
         encoded_question = self.__encode(raw_text_question)
         answer = self.__predict(encoded_question)
-        return " ".join(answer).capitalize()
+        result_text = " ".join(answer).capitalize()
+        return re.sub("( ,)+", ",", re.sub("( !)+", "!", re.sub("( \?)+","?", re.sub("( \.)+",".", result_text))))
 
     def __encode(self, input_phrase):
         tokenized = word_tokenize(input_phrase, "russian")

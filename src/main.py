@@ -1,7 +1,7 @@
 import os
 os.environ['KERAS_BACKEND']='tensorflow'
 from entities.Seq2Seq import CustomSeq2Seq
-from entities.GAN import GAN
+from entities.GAN3 import GAN3
 from dataset_creator import *
 
 
@@ -15,7 +15,7 @@ def __get_external_parameters():
     parser.add_argument('-c', type=str, dest='config_file', metavar='<config file>',
                         required=False, help='configuration file with dicts and max_len', default=None)
     parser.add_argument('-m', type=choose_model, dest='model', metavar='<model>',
-                        required=False, choices=(CustomSeq2Seq, GAN), help='model to use: seq2seq or gan', default="seq2seq")
+                        required=False, choices=(CustomSeq2Seq, GAN3), help='model to use: seq2seq or gan', default="seq2seq")
     args = parser.parse_args()
     directory = args.output_directory
     input_file = args.input_file
@@ -28,7 +28,7 @@ def choose_model(encoder_type):
     if encoder_type.lower() == "seq2seq":
         return CustomSeq2Seq
     elif encoder_type.lower() == "gan":
-        return GAN
+        return GAN3
     else:
         raise Exception("Unknown encoder name {}".format(encoder_type))
 
@@ -60,7 +60,7 @@ def main():
     embedding_size = 128
     hidden_size = 128
     max_features = len(id2word)
-    nn = nn_model(max_features, embedding_size, hidden_size, max_len)
+    nn = nn_model(max_features, embedding_size, hidden_size, max_len, target_directory)
     model = nn.train_model(dataset, max_len, max_features, BATCH_SIZE, EPOCHS)
     model.save(os.path.join(target_directory, "model.h5"))
 
