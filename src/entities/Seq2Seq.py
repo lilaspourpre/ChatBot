@@ -8,7 +8,6 @@ from entities.TrainModel import TrainModel
 
 
 class CustomSeq2Seq(TrainModel):
-
     def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory):
         super(CustomSeq2Seq, self).__init__()
         self.encoder_input = Input(shape=(max_len,))
@@ -33,7 +32,8 @@ class CustomSeq2Seq(TrainModel):
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model.fit_generator(self.__generator(dataset, batch_size, max_len, decode_size), epochs=epochs,
                                  steps_per_epoch=int(len(dataset)/batch_size),
-                                 validation_data=self.__generator(dataset, batch_size*2, max_len, decode_size, save=False),
+                                 validation_data=self.__generator(dataset, batch_size*2, max_len, decode_size,
+                                                                  save=False),
                                  validation_steps=int(len(dataset)/batch_size*2))
         return self.model
 
