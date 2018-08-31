@@ -65,6 +65,7 @@ def main():
     else:
         sentences = read_txt_file(input_file)
         data_set, id2word, word2ind, max_len = create_dataset(sentences)
+        write_to_json_config(os.path.join(target_directory, "config.json"), id2word, word2ind, max_len)
     max_features = len(id2word)
     nn = nn_model(max_features, embedding_size, hidden_size, max_len, target_directory)
     model = nn.train_model(data_set, max_len, max_features, batch_size, epochs)

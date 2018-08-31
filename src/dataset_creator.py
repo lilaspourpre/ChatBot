@@ -19,12 +19,13 @@ def _get_external_parameters():
 
 
 def _tokenize_sentence(sentence, language):
-    tokens = nltk.tokenize.word_tokenize(sentence, language)
+    tokenizer = nltk.load('../tokenizer_ru/{0}.pickle'.format(language))
+    tokens = nltk.tokenize.word_tokenize(sentence)
     return tokens
 
 
 def create_dataset(sentences):
-    sentences = [_tokenize_sentence(sentence, "english") for sentence in sentences]
+    sentences = [_tokenize_sentence(sentence, "russian") for sentence in sentences]
     max_len = max([len(i) for i in sentences])
     words = list(set([word.lower() for sent in sentences for word in sent]))
     word2ind = {word: index for index, word in enumerate(words, start=1)}
@@ -43,11 +44,19 @@ def read_txt_file(input_file):
 
 
 def _write_to_json(path, dataset, id2word, word2id, max_len):
-    with open(os.path.join(path, "dataset.json"), "w") as f:
+    _write_to_dataset_json(os.path.join(path, "dataset.json"), dataset)
+    write_to_json_config(os.path.join(path, "config.json"), id2word, word2id, max_len)
+
+
+def _write_to_dataset_json(path, dataset):
+    with open(path, "w") as f:
         for sentence in dataset:
             json.dump(sentence, f)
             f.write("\n")
-    with open(os.path.join(path, "config.json"), "w") as c:
+
+
+def write_to_json_config(path, id2word, word2id, max_len):
+    with open(path, "w") as c:
         config = OrderedDict([("id2word", id2word), ("word2id", word2id), ("max_len", max_len)])
         json.dump(config, c)
 
