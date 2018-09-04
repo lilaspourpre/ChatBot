@@ -2,6 +2,7 @@ import os
 os.environ['KERAS_BACKEND']='tensorflow'
 from entities.Seq2Seq import CustomSeq2Seq
 from entities.GAN3 import GAN3
+from entities.Transformer import Transformer
 from dataset_creator import *
 
 
@@ -14,8 +15,8 @@ def __get_external_parameters():
     parser.add_argument('-c', type=str, dest='config_file', metavar='<config file>',
                         required=False, help='configuration file with dicts and max_len', default=None)
     parser.add_argument('-m', type=choose_model, dest='model', metavar='<model>',
-                        required=False, choices=(CustomSeq2Seq, GAN3), help='model to use: seq2seq or gan',
-                        default="seq2seq")
+                        required=False, choices=(CustomSeq2Seq, GAN3), help='model to use: seq2seq or gan or transformer',
+                        default="transformer")
     parser.add_argument('-e', type=int, dest='epochs', metavar='<epochs>',
                         required=False, help='number of epochs', default=500)
     parser.add_argument('-b', type=int, dest='batch_size', metavar='<batch size>',
@@ -41,6 +42,8 @@ def choose_model(encoder_type):
         return CustomSeq2Seq
     elif encoder_type.lower() == "gan":
         return GAN3
+    elif encoder_type.lower() == "transformer":
+        return Transformer
     else:
         raise Exception("Unknown encoder name {}".format(encoder_type))
 
