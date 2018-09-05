@@ -3,6 +3,7 @@ os.environ['KERAS_BACKEND']='tensorflow'
 from entities.Seq2Seq import CustomSeq2Seq
 from entities.GAN3 import GAN3
 from entities.Transformer import Transformer
+from entities.AutoEncoder import AutoEncoder
 from dataset_creator import *
 
 
@@ -15,8 +16,8 @@ def __get_external_parameters():
     parser.add_argument('-c', type=str, dest='config_file', metavar='<config file>',
                         required=False, help='configuration file with dicts and max_len', default=None)
     parser.add_argument('-m', type=choose_model, dest='model', metavar='<model>',
-                        required=False, choices=(CustomSeq2Seq, GAN3), help='model to use: seq2seq or gan or transformer',
-                        default="transformer")
+                        required=False, choices=(CustomSeq2Seq, GAN3),
+                        help='model to use: seq2seq or gan or transformer or autoencoder', default="auto")
     parser.add_argument('-e', type=int, dest='epochs', metavar='<epochs>',
                         required=False, help='number of epochs', default=500)
     parser.add_argument('-b', type=int, dest='batch_size', metavar='<batch size>',
@@ -44,6 +45,8 @@ def choose_model(encoder_type):
         return GAN3
     elif encoder_type.lower() == "transformer":
         return Transformer
+    elif encoder_type.lower() == "auto":
+        return AutoEncoder
     else:
         raise Exception("Unknown encoder name {}".format(encoder_type))
 
@@ -59,6 +62,11 @@ def load_config(config_file):
     return config["id2word"], config["word2id"], config["max_len"]
 
 
+def save_model(model, target_directory):
+    #TODO: https://www.asozykin.ru/deep_learning/2017/02/12/How-to-save-trained-deep-net.html
+    pass
+
+
 def main():
     target_directory, input_file, config_file, nn_model, epochs, batch_size, embedding_size, hidden_size = \
         __get_external_parameters()
@@ -72,7 +80,7 @@ def main():
     max_features = len(id2word)
     nn = nn_model(max_features, embedding_size, hidden_size, max_len, target_directory)
     model = nn.train_model(data_set, max_len, max_features, batch_size, epochs)
-    model.save(os.path.join(target_directory, "final_model.h5"))
+    save_model(model, target_directory)
 
 
 if __name__ == '__main__':
