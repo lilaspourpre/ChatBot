@@ -5,6 +5,7 @@ from entities.TrainModel import TrainModel
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 
+
 class CustomSeq2Seq(TrainModel):
     model_name = "seq2seq"
 
