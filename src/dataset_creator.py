@@ -4,6 +4,7 @@ import os
 import json
 import re
 from collections import OrderedDict
+from yargy.tokenizer import MorphTokenizer
 
 
 def _get_external_parameters():
@@ -18,14 +19,14 @@ def _get_external_parameters():
     return directory, input_file
 
 
-def _tokenize_sentence(sentence, language):
-    tokenizer = nltk.load('../tokenizer_ru/{0}.pickle'.format(language))
-    tokens = nltk.tokenize.word_tokenize(sentence)
+def _tokenize_sentence(tokenizer, sentence):
+    tokens = tokenizer.split(sentence.replace("\n", ''))
     return tokens
 
 
 def create_dataset(sentences):
-    sentences = [_tokenize_sentence(sentence, "russian") for sentence in sentences]
+    tokenizer = MorphTokenizer()
+    sentences = [_tokenize_sentence(tokenizer, sentence) for sentence in sentences]
     max_len = max([len(i) for i in sentences])
     words = list(set([word.lower() for sent in sentences for word in sent]))
     word2ind = {word: index for index, word in enumerate(words, start=1)}
