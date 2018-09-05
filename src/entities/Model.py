@@ -11,7 +11,8 @@ class Model:
         self.__model = self.__load_model(model_path, json_path)
         self.__id2word, self.__word2id, self.__max_len = load_config(config_path)
 
-    def __load_model(self, weights_path, json_path):
+    @staticmethod
+    def __load_model(weights_path, json_path):
         with open(json_path, "r") as j:
             json_model = j.read()
             model = model_from_json(json_model)
