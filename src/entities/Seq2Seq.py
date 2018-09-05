@@ -6,6 +6,8 @@ from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 
 class CustomSeq2Seq(TrainModel):
+    model_name = "seq2seq"
+
     def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory):
         super(CustomSeq2Seq, self).__init__()
         self.encoder_input = Input(shape=(max_len,))

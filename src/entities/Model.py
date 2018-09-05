@@ -1,15 +1,22 @@
 import numpy as np
 from nltk.tokenize import word_tokenize
-from keras import models
+from keras.models import model_from_json
 from keras.preprocessing.sequence import pad_sequences
 import re
 from main import load_config
 
 
 class Model:
-    def __init__(self, config_path, model_path):
-        self.__model = models.load_model(model_path)
+    def __init__(self, config_path, model_path, json_path):
+        self.__model = self.__load_model(model_path, json_path)
         self.__id2word, self.__word2id, self.__max_len = load_config(config_path)
+
+    def __load_model(self, weights_path, json_path):
+        with open(json_path, "r") as j:
+            json_model = j.read()
+            model = model_from_json(json_model)
+        model.load_weights(weights_path)
+        return model
 
     def answer(self, raw_text_question):
         encoded_question = self.__encode(raw_text_question)

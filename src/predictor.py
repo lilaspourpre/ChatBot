@@ -12,13 +12,15 @@ def __get_external_parameters():
                         required=True, help='config file path')
     parser.add_argument('-m', type=str, dest='model_file', metavar='<model file>',
                         required=True, help='model file path')
+    parser.add_argument('-j', type=str, dest='json_config_path', metavar='<json>',
+                        required=True, help='json config file path')
     args = parser.parse_args()
-    return args.config_path, args.model_file
+    return args.config_path, args.model_file, args.json_config_path
 
 
 def main():
-    config_path, model_path = __get_external_parameters()
-    model = Model(config_path, model_path)
+    config_path, model_path, json_path = __get_external_parameters()
+    model = Model(config_path, model_path, json_path)
     input_phrase = "Какой полк?"
     print(input_phrase)
     print(model.answer(input_phrase))

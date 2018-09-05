@@ -6,6 +6,8 @@ import numpy as np
 
 
 class Transformer(TrainModel):
+    model_name = "transformer"
+
     def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory, n_head=4, d_k=32,
                  d_v=32, layers=2, dropout=0.1):
         super(Transformer, self).__init__()

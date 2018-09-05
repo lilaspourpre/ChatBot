@@ -6,6 +6,8 @@ import numpy as np
 
 
 class AutoEncoder(TrainModel):
+    model_name = "auto"
+
     def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory):
         super(AutoEncoder, self).__init__()
         self.encoder_input = Input(shape=(max_len,))
