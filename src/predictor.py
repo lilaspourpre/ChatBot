@@ -26,12 +26,12 @@ def main():
     input_phrase = "Успеют ли наши?"
     print(input_phrase)
     print(model.answer(input_phrase))
-    # while True:
-    #     question = input("Your turn: ")
-    #     if question.lower() == "exit":
-    #         print("Bye!")
-    #         break
-    #     print("Bot answers:" + model.answer(str(question)))
+    while True:
+        question = input("Your turn: ")
+        if question.lower() == "exit":
+            print("Bye!")
+            break
+        print("Bot answers:" + model.answer(str(question)))
     K.clear_session()
 
 
