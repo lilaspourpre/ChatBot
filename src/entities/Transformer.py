@@ -37,7 +37,8 @@ class Transformer(TrainModel):
         final_output = self.target_layer(dec_output)
         self.model = Model([self.encoder_input, self.decoder_input], final_output)
 
-    def __get_pos_seq(self, x):
+    @staticmethod
+    def __get_pos_seq(x):
         mask = K.cast(K.not_equal(x, 0), 'int32')
         pos = K.cumsum(K.ones_like(x, 'int32'), 1)
         return pos * mask
