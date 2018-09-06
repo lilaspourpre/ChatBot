@@ -1,15 +1,16 @@
 from keras.models import *
 from .HelperTransformerClasses import *
-from .TrainModel import TrainModel
+from .TrainModel import TrainModel, WeightsSaver
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 
 
 class AutoEncoder(TrainModel):
-    model_name = "auto"
+    model_name = "autoencoder"
 
     def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory):
         super(AutoEncoder, self).__init__()
+        self.target_directory = target_directory
         self.encoder_input = Input(shape=(max_len,))
         self.model = Sequential()
         self.model.add(Embedding(vocabulary_size, embedding_size, input_length=max_len))
@@ -21,12 +22,12 @@ class AutoEncoder(TrainModel):
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model.fit_generator(self.__generator(dataset, batch_size, max_len, decode_size), epochs=epochs,
                                  steps_per_epoch=int(len(dataset) / batch_size),
-                                 validation_data=self.__generator(dataset, batch_size * 2, max_len, decode_size,
-                                                                  save=False),
-                                 validation_steps=int(len(dataset) / batch_size * 2))
+                                 validation_data=self.__generator(dataset, batch_size * 2, max_len, decode_size),
+                                 validation_steps=int(len(dataset) / batch_size * 2),
+                                 callbacks=[WeightsSaver(self.target_directory, self.model_name)])
         return self.model
 
-    def __generator(self, dataset, batch_size, max_len, decode_size, save=True):
+    def __generator(self, dataset, batch_size, max_len, decode_size):
         samples_per_epoch = len(dataset)
         number_of_batches = int(samples_per_epoch / batch_size)
         counter = 0
@@ -40,5 +41,3 @@ class AutoEncoder(TrainModel):
             # restart counter to yeild data in the next epoch as well
             if counter == number_of_batches:
                 counter = 0
-
-

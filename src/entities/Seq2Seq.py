@@ -1,7 +1,7 @@
 from keras.layers.embeddings import Embedding
 from keras.models import Model
 from keras.layers import LSTM, Bidirectional, Input, TimeDistributed, Dense, RepeatVector, Flatten, Activation, Permute
-from entities.TrainModel import TrainModel
+from entities.TrainModel import TrainModel, WeightsSaver
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 
@@ -33,12 +33,12 @@ class CustomSeq2Seq(TrainModel):
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model.fit_generator(self.__generator(dataset, batch_size, max_len, decode_size), epochs=epochs,
                                  steps_per_epoch=int(len(dataset)/batch_size),
-                                 validation_data=self.__generator(dataset, batch_size*2, max_len, decode_size,
-                                                                  save=False),
-                                 validation_steps=int(len(dataset)/batch_size*2))
+                                 validation_data=self.__generator(dataset, batch_size*2, max_len, decode_size),
+                                 validation_steps=int(len(dataset)/batch_size*2),
+                                 callbacks=[WeightsSaver(self.target_directory, self.model_name)])
         return self.model
 
-    def __generator(self, dataset, batch_size, max_len, decode_size, save=True):
+    def __generator(self, dataset, batch_size, max_len, decode_size):
         samples_per_epoch = len(dataset)
         number_of_batches = int(samples_per_epoch / batch_size)
         counter = 0
