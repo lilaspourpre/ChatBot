@@ -15,11 +15,17 @@ class TrainModel:
         result[num] = 1
         return result
 
+    def save_model(self):
+        pass
+
+    def save_json(self, target_directory, model_name, model):
+        with open(os.path.join(target_directory, "{}_model.json".format(model_name)), "w") as j:
+            j.write(model.to_json())
+
 
 class WeightsSaver(Callback):
     def __init__(self, target_path, model_name):
         super(WeightsSaver, self).__init__()
-        self.target_path = target_path
         self.save_path = os.path.join(target_path, model_name+"_models")
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)

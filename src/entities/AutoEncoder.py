@@ -3,6 +3,7 @@ from .HelperTransformerClasses import *
 from .TrainModel import TrainModel, WeightsSaver
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
+import os
 
 
 class AutoEncoder(TrainModel):
@@ -20,6 +21,7 @@ class AutoEncoder(TrainModel):
 
     def train_model(self, dataset, max_len, decode_size, batch_size, epochs):
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        self.save_json(self.target_directory, self.model_name, self.model)
         self.model.fit_generator(self.__generator(dataset, batch_size, max_len, decode_size), epochs=epochs,
                                  steps_per_epoch=int(len(dataset) / batch_size),
                                  validation_data=self.__generator(dataset, batch_size * 2, max_len, decode_size),
@@ -41,3 +43,6 @@ class AutoEncoder(TrainModel):
             # restart counter to yeild data in the next epoch as well
             if counter == number_of_batches:
                 counter = 0
+
+    def save_model(self):
+        self.model.save_weights(os.path.join(self.target_directory, "{}_final_model.h5".format(self.model_name)))
