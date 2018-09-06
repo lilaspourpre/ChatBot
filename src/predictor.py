@@ -20,18 +20,21 @@ def __get_external_parameters():
 def main():
     config_path, model_path, json_path = __get_external_parameters()
     model = Model(config_path, model_path, json_path)
-    input_phrase = "Какой полк?"
-    print(input_phrase)
-    print(model.answer(input_phrase))
-    input_phrase = "Успеют ли наши?"
-    print(input_phrase)
-    print(model.answer(input_phrase))
+    # input_phrase = "Какой полк?"
+    # print(input_phrase)
+    # print(model.answer(input_phrase))
+    # input_phrase = "Успеют ли наши?"
+    # print(input_phrase)
+    # print(model.answer(input_phrase))
     while True:
-        question = input("Your turn: ")
-        if question.lower() == "exit":
-            print("Bye!")
+        question = input("Ваш вопрос: ")
+        if question.lower() == "exit" or question.lower() == "выйти":
+            print("Пока!")
             break
-        print("Bot answers:" + model.answer(str(question)))
+        try:
+            print(model.answer(str(question)))
+        except KeyError as e:
+            print("Я не знаю слова", e, ",", "простите")
     K.clear_session()
 
 
