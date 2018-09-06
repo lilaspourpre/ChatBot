@@ -1,6 +1,7 @@
 from keras.callbacks import Callback
 import os
 
+
 class TrainModel:
     def __init__(self):
         pass
