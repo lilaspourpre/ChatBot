@@ -30,7 +30,7 @@ def create_dataset(sentences):
     max_len = max([len(i) for i in sentences])
     words = list(set([word.lower() for sent in sentences for word in sent]))
     word2ind = {word: index for index, word in enumerate(words, start=1)}
-    ind2word = {index: word for index, word in enumerate(words, start=1)}
+    ind2word = {str(index): word for index, word in enumerate(words, start=1)}
     word2ind["<PAD>"] = 0
     ind2word[0] = "<PAD>"
     sentences_int = [[word2ind[w.lower()] for w in s] for s in sentences]

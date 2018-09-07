@@ -6,7 +6,7 @@ class TrainModel:
     def __init__(self):
         pass
 
-    def train_model(self, dataset, max_len, decode_size, batch_size, epochs):
+    def train_model(self, dataset, decode_size, batch_size, epochs):
         pass
 
     @staticmethod
@@ -18,9 +18,8 @@ class TrainModel:
     def save_model(self):
         pass
 
-    def save_json(self, target_directory, model_name, model):
-        with open(os.path.join(target_directory, "{}_model.json".format(model_name)), "w") as j:
-            j.write(model.to_json())
+    def predict(self, x_input):
+        pass
 
 
 class WeightsSaver(Callback):

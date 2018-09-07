@@ -12,6 +12,7 @@ class CustomSeq2Seq(TrainModel):
 
     def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory):
         super(CustomSeq2Seq, self).__init__()
+        self.max_len = max_len
         self.encoder_input = Input(shape=(max_len,))
         self.target_directory = target_directory
         self.epoch = 0
@@ -30,15 +31,21 @@ class CustomSeq2Seq(TrainModel):
         self.output = TimeDistributed(Dense(vocabulary_size, activation="softmax"))(self.decoder)
         self.model = Model(inputs=self.encoder_input, outputs=self.output)
 
-    def train_model(self, dataset, max_len, decode_size, batch_size, epochs):
+    def train_model(self, dataset, decode_size, batch_size, epochs):
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        self.save_json(self.target_directory, self.model_name, self.model)
-        self.model.fit_generator(self.__generator(dataset, batch_size, max_len, decode_size), epochs=epochs,
+        self.model.fit_generator(self.__generator(dataset, batch_size, self.max_len, decode_size), epochs=epochs,
                                  steps_per_epoch=int(len(dataset)/batch_size),
-                                 validation_data=self.__generator(dataset, batch_size*2, max_len, decode_size),
+                                 validation_data=self.__generator(dataset, batch_size*2, self.max_len, decode_size),
                                  validation_steps=int(len(dataset)/batch_size*2),
                                  callbacks=[WeightsSaver(self.target_directory, self.model_name)])
         return self.model
+
+    def save_model(self):
+        self.model.save_weights(os.path.join(self.target_directory, "{}_final_model.h5".format(self.model_name)))
+
+    def predict(self, x_input):
+        x_pad = pad_sequences([x_input], maxlen=self.max_len, padding="post")
+        return self.model.predict(x_pad)
 
     def __generator(self, dataset, batch_size, max_len, decode_size):
         samples_per_epoch = len(dataset)
@@ -54,7 +61,3 @@ class CustomSeq2Seq(TrainModel):
             # restart counter to yeild data in the next epoch as well
             if counter == number_of_batches:
                 counter = 0
-
-    def save_model(self):
-        self.model.save_weights(os.path.join(self.target_directory, "{}_final_model.h5".format(self.model_name)))
-
