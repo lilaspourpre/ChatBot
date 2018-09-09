@@ -1,32 +1,39 @@
 import os
 os.environ['KERAS_BACKEND']='tensorflow'
-from entities.Seq2Seq import CustomSeq2Seq
-from entities.Transformer import Transformer
-from entities.AutoEncoder import AutoEncoder
-from dataset_creator import *
-from predictor import predict_loop
-from entities.PredictModel import PredictModel
+from .entities.Seq2Seq import CustomSeq2Seq
+from .entities.Transformer import Transformer
+from .entities.AutoEncoder import AutoEncoder
+from .dataset_creator import *
+from .predictor import predict_loop
+from .entities.PredictModel import PredictModel
 
 
 def __get_external_parameters():
     parser = argparse.ArgumentParser(description='Train sequence model for dialogues')
-    parser.add_argument('-o', type=str, dest='output_directory', metavar='<directory>',
-                        required=True, help='directory for results')
-    parser.add_argument('-i', type=str, dest='input_file', metavar='<input file>',
-                        required=True, help='input file (raw or prepared json)')
-    parser.add_argument('-c', type=str, dest='config_file', metavar='<config file>',
+    parser.add_argument('-config', type=str, dest='config_file', metavar='<config file>',
                         required=False, help='configuration file with dicts and max_len', default=None)
-    parser.add_argument('-m', type=choose_model, dest='model', metavar='<model>',
+    parser.add_argument('-model-type', type=choose_model, dest='model', metavar='<model>',
                         required=False, choices=(CustomSeq2Seq, Transformer, AutoEncoder),
                         help='model to use: seq2seq or gan or transformer or autoencoder', default="autoencoder")
-    parser.add_argument('-e', type=int, dest='epochs', metavar='<epochs>',
+    parser.add_argument('-epochs', type=int, dest='epochs', metavar='<epochs>',
                         required=False, help='number of epochs', default=500)
-    parser.add_argument('-b', type=int, dest='batch_size', metavar='<batch size>',
+    parser.add_argument('-batch', type=int, dest='batch_size', metavar='<batch size>',
                         required=False, help='batch size', default=16)
-    parser.add_argument('-s', type=int, dest='embedding_size', metavar='<embedding size>',
+    parser.add_argument('-embedding', type=int, dest='embedding_size', metavar='<embedding size>',
                         required=False, help='embedding size', default=128)
-    parser.add_argument('-l', type=int, dest='hidden_size', metavar='<hidden size>',
+    parser.add_argument('-hidden', type=int, dest='hidden_size', metavar='<hidden size>',
                         required=False, help='hidden size', default=128)
+
+    subparsers = parser.add_subparsers(help='sub-command help')
+    parser_train = subparsers.add_parser('train', help="train mode")
+    parser_train.add_argument('-dir', type=str, dest='output_directory', metavar='<directory>',
+                        required=True, help='directory for results')
+    parser_train.add_argument('-input', type=str, dest='input_file', metavar='<input file>',
+                        required=True, help='input file (raw or prepared json)')
+
+    parser_test = subparsers.add_parser('test', help='test mode')
+    parser_test.add_argument('-model-path', type=str, help='model path')
+    
     args = parser.parse_args()
     directory = args.output_directory
     input_file = args.input_file
