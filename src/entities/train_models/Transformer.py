@@ -12,7 +12,9 @@ class Transformer(TrainModel):
     def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory="", n_head=4, d_k=32,
                  d_v=32, layers=2, dropout=0.1):
         super(Transformer, self).__init__()
+        self.decode_model = None
         self.max_len = max_len
+        self.embedding_size = embedding_size
         self.encoder_input = Input(shape=(max_len,))
         self.decoder_input = Input(shape=(max_len,))
         self.target_directory = target_directory
@@ -57,7 +59,13 @@ class Transformer(TrainModel):
 
     def predict(self, x_input):
         x_pad = pad_sequences([x_input], maxlen=self.max_len, padding="post")
-        return self.model.predict(x_pad)
+        target_seq = np.zeros((1, self.max_len), dtype='int32')
+        for i in range(self.max_len - 1):
+            output = self.model.predict_on_batch([x_pad, target_seq])
+            sampled_index = np.argmax(output[0, i, :])
+            print(sampled_index)
+            target_seq[0, i + 1] = sampled_index
+        return target_seq
 
     def __generator(self, dataset, batch_size, max_len, decode_size):
         samples_per_epoch = len(dataset)
