@@ -5,6 +5,7 @@ from keras import backend as K
 from entities.train_models.Seq2Seq import CustomSeq2Seq
 from entities.train_models.Transformer import Transformer
 from entities.train_models.AutoEncoder import AutoEncoder
+from entities.train_models.Seq2SeqWithInputs import Seq2Seq
 from dataset_creator import *
 from entities.PredictModel import PredictModel
 
@@ -14,7 +15,7 @@ def __get_external_parameters():
     parser.add_argument('-config', type=str, dest='config_file', metavar='<config file>',
                         required=False, help='configuration file with dicts and max_len', default=None)
     parser.add_argument('-model-type', type=choose_model, dest='model', metavar='<model>',
-                        required=True, choices=(CustomSeq2Seq, Transformer, AutoEncoder),
+                        required=True, choices=(CustomSeq2Seq, Transformer, AutoEncoder, Seq2Seq),
                         help='model to use: seq2seq or gan or transformer or autoencoder', default="autoencoder")
     parser.add_argument('-embedding', type=int, dest='embedding_size', metavar='<embedding size>',
                         required=False, help='embedding size', default=128)
@@ -51,6 +52,8 @@ def choose_model(encoder_type):
         return Transformer
     elif encoder_type.lower() == "autoencoder":
         return AutoEncoder
+    elif encoder_type.lower() == "seq2seqwithinputs":
+        return Seq2Seq
     else:
         raise Exception("Unknown encoder name {}".format(encoder_type))
 
@@ -110,8 +113,8 @@ def _predict_loop(model):
 
 
 def main():
-    # -model-type autoencoder train -dir ../datasets/dataset_ru_small -input ../datasets/dataset_ru_small/conversations.txt -epochs 30
-    # -model-type transformer -config ../datasets/dataset_ru_small/config.json test -model-path ../datasets/dataset_ru_small/transformer_final_model.h5
+    # -model-type seq2seqwithinputs train -dir ../datasets/dataset_ru_small -input ../datasets/dataset_ru_small/conversations.txt -epochs 30
+    # -model-type seq2seqwithinputs -config ../datasets/dataset_ru_small/config.json test -model-path ../datasets/dataset_ru_small/seq2seqwithinputs_final_model.h5
     args = __get_external_parameters()
     run_mode = args.command()
     run_mode(args)
