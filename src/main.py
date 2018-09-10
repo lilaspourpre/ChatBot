@@ -2,9 +2,9 @@ import os
 
 os.environ['KERAS_BACKEND'] = 'tensorflow'
 from keras import backend as K
-from entities.Seq2Seq import CustomSeq2Seq
-from entities.Transformer import Transformer
-from entities.AutoEncoder import AutoEncoder
+from entities.train_models.Seq2Seq import CustomSeq2Seq
+from entities.train_models.Transformer import Transformer
+from entities.train_models.AutoEncoder import AutoEncoder
 from dataset_creator import *
 from entities.PredictModel import PredictModel
 
@@ -110,7 +110,8 @@ def _predict_loop(model):
 
 
 def main():
-    #  -epochs 30 -model-type autoencoder train -dir ../datasets/dataset_ru_small -input ../datasets/dataset_ru_small/conversations.txt
+    # -model-type autoencoder train -dir ../datasets/dataset_ru_small -input ../datasets/dataset_ru_small/conversations.txt -epochs 30
+    # -model-type transformer -config ../datasets/dataset_ru_small/config.json test -model-path ../datasets/dataset_ru_small/transformer_final_model.h5
     args = __get_external_parameters()
     run_mode = args.command()
     run_mode(args)

@@ -1,5 +1,5 @@
 from keras.models import *
-from .HelperTransformerClasses import *
+from ..helpers.HelperTransformerClasses import *
 from .TrainModel import TrainModel, WeightsSaver
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
