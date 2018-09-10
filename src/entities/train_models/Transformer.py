@@ -60,12 +60,11 @@ class Transformer(TrainModel):
     def predict(self, x_input):
         x_pad = pad_sequences([x_input], maxlen=self.max_len, padding="post")
         target_seq = np.zeros((1, self.max_len), dtype='int32')
-        for i in range(self.max_len - 1):
+        for i in range(self.max_len):
             output = self.model.predict_on_batch([x_pad, target_seq])
             sampled_index = np.argmax(output[0, i, :])
-            print(sampled_index)
-            target_seq[0, i + 1] = sampled_index
-        return target_seq
+            target_seq[0, i] = sampled_index
+        return output
 
     def __generator(self, dataset, batch_size, max_len, decode_size):
         samples_per_epoch = len(dataset)
