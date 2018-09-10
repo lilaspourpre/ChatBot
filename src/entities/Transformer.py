@@ -9,7 +9,7 @@ import os
 class Transformer(TrainModel):
     model_name = "transformer"
 
-    def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory, n_head=4, d_k=32,
+    def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory="", n_head=4, d_k=32,
                  d_v=32, layers=2, dropout=0.1):
         super(Transformer, self).__init__()
         self.max_len = max_len
@@ -51,7 +51,6 @@ class Transformer(TrainModel):
                                  validation_data=self.__generator(dataset, batch_size * 2, self.max_len, decode_size),
                                  validation_steps=int(len(dataset) / batch_size * 2),
                                  callbacks=[WeightsSaver(self.target_directory, self.model_name)])
-        return self.model
 
     def save_model(self):
         self.model.save_weights(os.path.join(self.target_directory, "{}_final_model.h5".format(self.model_name)))

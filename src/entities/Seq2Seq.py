@@ -10,7 +10,7 @@ import os
 class CustomSeq2Seq(TrainModel):
     model_name = "seq2seq"
 
-    def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory):
+    def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory=""):
         super(CustomSeq2Seq, self).__init__()
         self.max_len = max_len
         self.encoder_input = Input(shape=(max_len,))
@@ -38,7 +38,6 @@ class CustomSeq2Seq(TrainModel):
                                  validation_data=self.__generator(dataset, batch_size*2, self.max_len, decode_size),
                                  validation_steps=int(len(dataset)/batch_size*2),
                                  callbacks=[WeightsSaver(self.target_directory, self.model_name)])
-        return self.model
 
     def save_model(self):
         self.model.save_weights(os.path.join(self.target_directory, "{}_final_model.h5".format(self.model_name)))

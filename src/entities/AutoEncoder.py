@@ -9,7 +9,7 @@ import os
 class AutoEncoder(TrainModel):
     model_name = "autoencoder"
 
-    def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory):
+    def __init__(self, vocabulary_size, embedding_size, hidden_size, max_len, target_directory=""):
         super(AutoEncoder, self).__init__()
         self.max_len = max_len
         self.target_directory = target_directory
@@ -27,7 +27,6 @@ class AutoEncoder(TrainModel):
                                  validation_data=self.__generator(dataset, batch_size * 2, self.max_len, decode_size),
                                  validation_steps=int(len(dataset) / batch_size * 2),
                                  callbacks=[WeightsSaver(self.target_directory, self.model_name)])
-        return self.model
 
     def save_model(self):
         self.model.save_weights(os.path.join(self.target_directory, "{}_final_model.h5".format(self.model_name)))
