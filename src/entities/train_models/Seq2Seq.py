@@ -34,9 +34,9 @@ class CustomSeq2Seq(TrainModel):
     def train_model(self, dataset, decode_size, batch_size, epochs):
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model.fit_generator(self.__generator(dataset, batch_size, self.max_len, decode_size), epochs=epochs,
-                                 steps_per_epoch=int(len(dataset)/batch_size),
-                                 validation_data=self.__generator(dataset, batch_size*2, self.max_len, decode_size),
-                                 validation_steps=int(len(dataset)/batch_size*2),
+                                 steps_per_epoch=int(len(dataset) / batch_size),
+                                 validation_data=self.__generator(dataset, batch_size * 2, self.max_len, decode_size),
+                                 validation_steps=int(len(dataset) / batch_size * 2),
                                  callbacks=[WeightsSaver(self.target_directory, self.model_name)])
 
     def save_model(self):

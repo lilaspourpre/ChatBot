@@ -25,7 +25,7 @@ class TrainModel:
 class WeightsSaver(Callback):
     def __init__(self, target_path, model_name):
         super(WeightsSaver, self).__init__()
-        self.save_path = os.path.join(target_path, model_name+"_models")
+        self.save_path = os.path.join(target_path, model_name + "_models")
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
 

@@ -1,5 +1,4 @@
 import os
-
 os.environ['KERAS_BACKEND'] = 'tensorflow'
 from keras import backend as K
 from entities.train_models.Seq2Seq import CustomSeq2Seq
@@ -41,7 +40,7 @@ def __get_external_parameters():
 
     args = parser.parse_args()
     if not hasattr(args, 'command'):
-        parser.error('command not specified')
+        parser.error('run mode (train or test) not specified')
     return args
 
 
@@ -113,8 +112,6 @@ def _predict_loop(model):
 
 
 def main():
-    # -model-type seq2seqwithinputs train -dir ../datasets/dataset_ru_small -input ../datasets/dataset_ru_small/conversations.txt -epochs 30
-    # -model-type seq2seqwithinputs -config ../datasets/dataset_ru_small/config.json test -model-path ../datasets/dataset_ru_small/seq2seqwithinputs_final_model.h5
     args = __get_external_parameters()
     run_mode = args.command()
     run_mode(args)
