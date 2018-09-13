@@ -1,4 +1,5 @@
 import os
+import numpy as np
 os.environ['KERAS_BACKEND'] = 'tensorflow'
 from keras import backend as K
 from entities.train_models.Seq2Seq import CustomSeq2Seq
@@ -7,6 +8,7 @@ from entities.train_models.AutoEncoder import AutoEncoder
 from entities.train_models.Seq2SeqWithInputs import Seq2Seq
 from dataset_creator import *
 from entities.PredictModel import PredictModel
+from keras.preprocessing.sequence import pad_sequences
 
 
 def __get_external_parameters():
@@ -57,10 +59,76 @@ def choose_model(encoder_type):
         raise Exception("Unknown encoder name {}".format(encoder_type))
 
 
+def decode(num, decode_size):
+    result = [0] * decode_size
+    result[num] = 1
+    return result
+
+
 def read_json_file(input_file):
     with open(input_file, "r", encoding="utf-8") as f:
         sentences_list = f.readlines()
     return [json.loads(sentence) for sentence in sentences_list[:-1]]
+
+
+def __generator(dataset, batch_size, max_len, decode_size):
+    def generator():
+        samples_per_epoch = len(dataset)
+        number_of_batches = int(samples_per_epoch / batch_size)
+        counter = 0
+        while 1:
+            dataset_batch = np.array(dataset[batch_size * counter:batch_size * (counter + 1)])
+            x_batch = pad_sequences([d[0] for d in dataset_batch], maxlen=max_len, padding="post")
+            y_batch_input = pad_sequences([d[1] for d in dataset_batch],
+                                          maxlen=max_len, padding="post")
+            y_batch = pad_sequences([[decode(i, decode_size) for i in d[1]] for d in dataset_batch],
+                                    maxlen=max_len, padding="post")
+            counter += 1
+            yield [x_batch, y_batch_input], y_batch
+            # restart counter to yeild data in the next epoch as well
+            if counter == number_of_batches:
+                counter = 0
+    return generator
+
+
+def __generate_no_batches(input_file, max_len, decode_size):
+    def generator():
+        while 1:
+            with open(input_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = json.loads(line)
+                    x = pad_sequences([line[0]], maxlen=max_len, padding="post")
+                    y = pad_sequences([[decode(i, decode_size) for i in line[1]]], maxlen=max_len, padding="post")
+                    yield [x], y
+    return generator
+
+
+def _make_gen(reader):
+    b = reader(1024 * 1024)
+    while b:
+        yield b
+        b = reader(1024*1024)
+
+
+def rawgencount(filename):
+    f = open(filename, 'rb')
+    f_gen = _make_gen(f.raw.read)
+    return sum(buf.count(b'\n') for buf in f_gen )
+
+
+def generate_input(args):
+    if args.config_file:
+        id2word, word2id, max_len = load_config(args.config_file)
+        max_features = len(id2word)
+        generator = __generate_no_batches(args.input_file, max_len, max_features)
+        return generator, rawgencount(args.input_file), max_len, max_features, 1
+    else:
+        sentences = read_txt_file(args.input_file)
+        dataset, id2word, word2id, max_len = create_dataset(sentences)
+        write_to_json_config(os.path.join(args.output_directory, "config.json"), id2word, word2id, max_len)
+        max_features = len(id2word)
+        generator = __generator(dataset, args.batch_size, max_len, max_features)
+        return generator, len(dataset), max_len, max_features, args.batch_size
 
 
 def load_config(config_file):
@@ -70,16 +138,9 @@ def load_config(config_file):
 
 def _train_mode():
     def _run(args):
-        if args.config_file:
-            dataset = read_json_file(args.input_file)
-            id2word, word2id, max_len = load_config(args.config_file)
-        else:
-            sentences = read_txt_file(args.input_file)
-            dataset, id2word, word2id, max_len = create_dataset(sentences)
-            write_to_json_config(os.path.join(args.output_directory, "config.json"), id2word, word2id, max_len)
-        max_features = len(id2word)
+        generator, dataset_len, max_len, max_features, batch_size = generate_input(args)
         nn = args.model(max_features, args.embedding_size, args.hidden_size, max_len, args.output_directory)
-        nn.train_model(dataset, max_features, args.batch_size, args.epochs)
+        nn.train_model(generator, batch_size, args.epochs, dataset_len)
         nn.save_model()
 
     return _run

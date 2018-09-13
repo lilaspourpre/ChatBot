@@ -6,14 +6,8 @@ class TrainModel:
     def __init__(self):
         pass
 
-    def train_model(self, dataset, decode_size, batch_size, epochs):
+    def train_model(self, generator, batch_size, epochs, dataset_len):
         pass
-
-    @staticmethod
-    def decode(num, decode_size):
-        result = [0] * decode_size
-        result[num] = 1
-        return result
 
     def save_model(self):
         pass
