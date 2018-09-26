@@ -16,8 +16,8 @@ def __get_external_parameters():
     parser.add_argument('-config', type=str, dest='config_file', metavar='<config file>',
                         required=False, help='configuration file with dicts and max_len', default=None)
     parser.add_argument('-model-type', type=choose_model, dest='model', metavar='<model>',
-                        required=True, choices=(CustomSeq2Seq, Transformer, AutoEncoder, Seq2Seq),
-                        help='model to use: seq2seq or gan or transformer or autoencoder', default="autoencoder")
+                        required=True, choices=(CustomSeq2Seq, Transformer, Seq2Seq),
+                        help='model to use: seq2seq or seq2seqwithinputs or transformer', default="seq2seq")
     parser.add_argument('-embedding', type=int, dest='embedding_size', metavar='<embedding size>',
                         required=False, help='embedding size', default=128)
     parser.add_argument('-hidden', type=int, dest='hidden_size', metavar='<hidden size>',
@@ -51,8 +51,6 @@ def choose_model(encoder_type):
         return CustomSeq2Seq
     elif encoder_type.lower() == "transformer":
         return Transformer
-    elif encoder_type.lower() == "autoencoder":
-        return AutoEncoder
     elif encoder_type.lower() == "seq2seqwithinputs":
         return Seq2Seq
     else:
@@ -116,7 +114,7 @@ def rawgencount(filename):
     return sum(buf.count(b'\n') for buf in f_gen )
 
 
-def generate_input(args):
+def generate_input(args, create_function):
     if args.config_file:
         id2word, word2id, max_len = load_config(args.config_file)
         max_features = len(id2word)
@@ -124,7 +122,7 @@ def generate_input(args):
         return generator, rawgencount(args.input_file), max_len, max_features, 1
     else:
         sentences = read_txt_file(args.input_file)
-        dataset, id2word, word2id, max_len = create_dataset(sentences)
+        dataset, id2word, word2id, max_len = prepare_for_dataset(sentences, create_function)
         write_to_json_config(os.path.join(args.output_directory, "config.json"), id2word, word2id, max_len)
         max_features = len(id2word)
         generator = __generator(dataset, args.batch_size, max_len, max_features)
@@ -138,7 +136,7 @@ def load_config(config_file):
 
 def _train_mode():
     def _run(args):
-        generator, dataset_len, max_len, max_features, batch_size = generate_input(args)
+        generator, dataset_len, max_len, max_features, batch_size = generate_input(args, create_dataset)
         nn = args.model(max_features, args.embedding_size, args.hidden_size, max_len, args.output_directory)
         nn.train_model(generator, batch_size, args.epochs, dataset_len)
         nn.save_model()
