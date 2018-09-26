@@ -96,8 +96,9 @@ def __generate_no_batches(input_file, max_len, decode_size):
                 for line in f:
                     line = json.loads(line)
                     x = pad_sequences([line[0]], maxlen=max_len, padding="post")
+                    x_d = pad_sequences([line[1]], maxlen=max_len, padding="post")
                     y = pad_sequences([[decode(i, decode_size) for i in line[1]]], maxlen=max_len, padding="post")
-                    yield [x], y
+                    yield [x, x_d], y
     return generator
 
 
