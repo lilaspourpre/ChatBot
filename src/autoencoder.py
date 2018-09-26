@@ -4,7 +4,7 @@ from keras import backend as K
 import argparse
 from .entities.train_models.AutoEncoder import AutoEncoder
 from .entities.PredictModel import PredictModel
-from main import load_config, generate_input
+from main import load_config, generate_input, predict_loop
 
 
 def _get_external_parameters():
@@ -71,22 +71,8 @@ def _test_mode():
             raise FileNotFoundError("Config path is none")
         nn = AutoEncoder(len(id2word), args.embedding_size, args.hidden_size, max_len)
         nn.model.load_weights(args.model_path)
-        _predict_loop(PredictModel(nn, (id2word, word2id, max_len)))
-
+        predict_loop(PredictModel(nn, (id2word, word2id, max_len)))
     return _run
-
-
-def _predict_loop(model):
-    while True:
-        question = input("Начните фразу: ")
-        if question.lower() == "exit" or question.lower() == "выйти":
-            print("Пока!")
-            break
-        try:
-            print(model.answer(str(question)))
-        except KeyError as e:
-            print("Я не знаю слова", e, ",", "простите")
-    K.clear_session()
 
 
 def main():

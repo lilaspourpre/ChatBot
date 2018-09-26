@@ -152,12 +152,12 @@ def _test_mode():
             raise FileNotFoundError("Config path is none")
         nn = args.model(len(id2word), args.embedding_size, args.hidden_size, max_len)
         nn.model.load_weights(args.model_path)
-        _predict_loop(PredictModel(nn, (id2word, word2id, max_len)))
+        predict_loop(PredictModel(nn, (id2word, word2id, max_len)))
 
     return _run
 
 
-def _predict_loop(model):
+def predict_loop(model):
     while True:
         question = input("Ваш вопрос: ")
         if question.lower() == "exit" or question.lower() == "выйти":
