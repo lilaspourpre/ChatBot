@@ -1,9 +1,8 @@
 import os
 os.environ['KERAS_BACKEND'] = 'tensorflow'
-from keras import backend as K
 import argparse
-from .entities.train_models.AutoEncoder import AutoEncoder
-from .entities.PredictModel import PredictModel
+from entities.train_models.AutoEncoder import AutoEncoder
+from entities.PredictModel import PredictModel
 from main import load_config, generate_input, predict_loop
 
 
