@@ -49,7 +49,7 @@ def create_autoencoder_dataset(words, sentences):
     result_list = []
     for sentence in sentences_int:
         result_list.append([sentence, sentence[1:]+[1]])
-    return result_list, word2ind, ind2word
+    return result_list, ind2word, word2ind
 
 
 def _train_mode():

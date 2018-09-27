@@ -39,7 +39,7 @@ def create_dataset(words, sentences):
     sentences_int = [[word2ind[w.lower()] for w in s] for s in sentences]
     word2ind["<PAD>"] = 0
     ind2word[0] = "<PAD>"
-    return nltk.bigrams(sentences_int)
+    return list(nltk.bigrams(sentences_int)), ind2word, word2ind
 
 
 def read_txt_file(input_file):
