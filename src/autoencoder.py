@@ -54,7 +54,8 @@ def create_autoencoder_dataset(words, sentences):
 
 def _train_mode():
     def _run(args):
-        generator, dataset_len, max_len, max_features, batch_size = generate_input(args, create_autoencoder_dataset)
+        generator, dataset_len, max_len, max_features, batch_size = generate_input(args, create_autoencoder_dataset,
+                                                                                   AutoEncoder.model_name)
         nn = AutoEncoder(max_features, args.embedding_size, args.hidden_size, max_len, args.output_directory)
         nn.train_model(generator, batch_size, args.epochs, dataset_len)
         nn.save_model()

@@ -69,7 +69,15 @@ def read_json_file(input_file):
     return [json.loads(sentence) for sentence in sentences_list[:-1]]
 
 
-def __generator(dataset, batch_size, max_len, decode_size):
+def __generator(dataset, batch_size, max_len, decode_size, model_name):
+    def input_correct(model_name):
+        if model_name == Seq2Seq.model_name or model_name == AutoEncoder.model_name:
+            return lambda x, y: [x[0], y]
+        else:
+            return lambda x, y: [x, y]
+
+    convert = input_correct(model_name)
+
     def generator():
         samples_per_epoch = len(dataset)
         number_of_batches = int(samples_per_epoch / batch_size)
@@ -82,14 +90,23 @@ def __generator(dataset, batch_size, max_len, decode_size):
             y_batch = pad_sequences([[decode(i, decode_size) for i in d[1]] for d in dataset_batch],
                                     maxlen=max_len, padding="post")
             counter += 1
-            yield [x_batch, y_batch_input], y_batch
+            c_x, c_y = convert([x_batch, y_batch_input], y_batch)
+            yield c_x, c_y
             # restart counter to yeild data in the next epoch as well
             if counter == number_of_batches:
                 counter = 0
     return generator
 
 
-def __generate_no_batches(input_file, max_len, decode_size):
+def __generate_no_batches(input_file, max_len, decode_size, model_name):
+    def input_correct(model_name):
+        if model_name == Seq2Seq.model_name or model_name == AutoEncoder.model_name:
+            return lambda x, y: [x[0], y]
+        else:
+            return lambda x, y: [x, y]
+
+    convert = input_correct(model_name)
+
     def generator():
         while 1:
             with open(input_file, "r", encoding="utf-8") as f:
@@ -98,7 +115,8 @@ def __generate_no_batches(input_file, max_len, decode_size):
                     x = pad_sequences([line[0]], maxlen=max_len, padding="post")
                     x_d = pad_sequences([line[1]], maxlen=max_len, padding="post")
                     y = pad_sequences([[decode(i, decode_size) for i in line[1]]], maxlen=max_len, padding="post")
-                    yield [x, x_d], y
+                    c_x, c_y = convert([x, x_d], y)
+                    yield c_x, c_y
     return generator
 
 
@@ -115,18 +133,20 @@ def rawgencount(filename):
     return sum(buf.count(b'\n') for buf in f_gen )
 
 
-def generate_input(args, create_function):
+def generate_input(args, create_function, model_name=None):
+    if model_name is None:
+        model_name = args.model.model_name
     if args.config_file:
         id2word, word2id, max_len = load_config(args.config_file)
         max_features = len(id2word)
-        generator = __generate_no_batches(args.input_file, max_len, max_features)
+        generator = __generate_no_batches(args.input_file, max_len, max_features, model_name)
         return generator, rawgencount(args.input_file), max_len, max_features, 1
     else:
         sentences = read_txt_file(args.input_file)
         dataset, id2word, word2id, max_len = prepare_for_dataset(sentences, create_function)
         write_to_json_config(os.path.join(args.output_directory, "config.json"), id2word, word2id, max_len)
         max_features = len(id2word)
-        generator = __generator(dataset, args.batch_size, max_len, max_features)
+        generator = __generator(dataset, args.batch_size, max_len, max_features, model_name)
         return generator, len(dataset), max_len, max_features, args.batch_size
 
 
